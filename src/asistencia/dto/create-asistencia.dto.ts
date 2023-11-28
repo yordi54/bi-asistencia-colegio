@@ -1,9 +1,7 @@
 import { IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class CreateAsistenciaDto {
-    @IsNumber()
-    @IsNotEmpty()
-    id: number;
+    
     @IsString()
     @IsNotEmpty()
     tiempo_retraso: string;
