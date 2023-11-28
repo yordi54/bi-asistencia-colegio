@@ -4,17 +4,29 @@ import { UpdateHorarioLaboralDto } from './dto/update-horario_laboral.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HorarioLaboral } from './entities/horario_laboral.entity';
 import { Repository } from 'typeorm';
-import { parse } from 'path';
-import { CreateAsistenciaDto } from '../asistencia/dto/create-asistencia.dto';
-
+import { DocenteService } from 'src/docente/docente.service';
+import { HorarioDiasService } from 'src/horario_dias/horario_dias.service';
 @Injectable()
 export class HorarioLaboralService {
-  constructor(@InjectRepository(HorarioLaboral) private readonly horarioLaboralRepository: Repository<HorarioLaboral> ) {}
+  constructor(@InjectRepository(HorarioLaboral) private readonly horarioLaboralRepository: Repository<HorarioLaboral>, 
+  private readonly docenteService: DocenteService,
+  private readonly horarioDiaService: HorarioDiasService
+  ) {}
 
   async create(createHorarioLaboralDto: CreateHorarioLaboralDto) {
-    const {docente, horarioDia,id} = createHorarioLaboralDto;
-    const horarioLaboral = await this.horarioLaboralRepository.create(createHorarioLaboralDto);   
-    return await this.horarioLaboralRepository.save(horarioLaboral);
+    const { docente, horarioDia, id } = createHorarioLaboralDto;
+
+    const docente_data = await this.docenteService.getDocente(docente);
+    console.log(docente_data);
+    const horario = await this.horarioDiaService.getHorarioDia(horarioDia);
+    console.log(horario);
+    // Crea una nueva instancia de HorarioLaboral con los datos proporcionados
+    const nuevoHorarioLaboral = this.horarioLaboralRepository.create([{
+      id,
+      docente:  docente_data,
+      horarioDia: horario
+    }]);  
+    return await this.horarioLaboralRepository.save(nuevoHorarioLaboral);
   }
 
   findAll() {
@@ -31,6 +43,14 @@ export class HorarioLaboralService {
 
   remove(id: number) {
     return `This action removes a #${id} horarioLaboral`;
+  }
+
+  async ultimoId() {
+    const ultimo = await this.horarioLaboralRepository
+      .createQueryBuilder('horario_laboral')
+      .select('MAX(horario_laboral.id)', 'max')
+      .getRawOne();
+    return ultimo;
   }
 
   async getHorarioLaboralByDia(id: number, docenteId : number) {

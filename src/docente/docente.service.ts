@@ -39,4 +39,8 @@ export class DocenteService {
   remove(id: number) {
     return `This action removes a #${id} docente`;
   }
+
+  async getDocente(id: number){
+    return await this.docenteRepository.findOne({where: {id}});
+  }
 }

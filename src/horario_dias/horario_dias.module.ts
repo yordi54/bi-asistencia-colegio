@@ -12,6 +12,6 @@ import { HorarioDia } from './entities/horario_dia.entity';
   ],
   controllers: [HorarioDiasController],
   providers: [HorarioDiasService],
-  exports: [TypeOrmModule]
+  exports: [TypeOrmModule, HorarioDiasService]
 })
 export class HorarioDiasModule {}

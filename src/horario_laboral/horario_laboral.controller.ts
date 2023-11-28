@@ -12,6 +12,11 @@ export class HorarioLaboralController {
     return this.horarioLaboralService.create(createHorarioLaboralDto);
   }
 
+  @Get('ultimo-id')
+  ultimoId(){
+    return this.horarioLaboralService.ultimoId();
+  }
+
   @Get()
   findAll() {
     return this.horarioLaboralService.findAll();
