@@ -8,13 +8,15 @@ import { Falta } from 'src/falta/entities/falta.entity';
 import { Licencia } from 'src/licencia/entities/licencia.entity';
 import { FaltaService } from 'src/falta/falta.service';
 import { LicenciaService } from 'src/licencia/licencia.service';
+import { HorarioLaboralService } from 'src/horario_laboral/horario_laboral.service';
 
 @Injectable()
 export class AsistenciaService {
   
   constructor(@InjectRepository(Asistencia) private readonly asistenciaRepository: Repository<Asistencia>,
               private readonly faltaService : FaltaService,
-              private readonly licenciaService : LicenciaService
+              private readonly licenciaService : LicenciaService,
+              private readonly horarioLaboralService: HorarioLaboralService
               ) {}
   
   
@@ -97,8 +99,33 @@ export class AsistenciaService {
     return results || [];
   }
 
-  create(createAsistenciaDto: CreateAsistenciaDto) {
-    return 'This action adds a new asistencia';
+  async create(createAsistenciaDto: CreateAsistenciaDto) {
+    //guardar 
+    const {fecha, docente_id, hora_entrada } = createAsistenciaDto;
+    //convertir el string fecha a dia de la semana
+    const fechaDate = new Date(fecha);
+    // obtener el dia de la semana si es lunes o martes, etc
+    const diaSemana = fechaDate.getDay();
+    const hora_fija = '07:30:00';
+    const horaEntrada = new Date(`1970-01-01T${hora_entrada}`).getMinutes();
+    const horaMeta = new Date(`1970-01-01T${hora_fija}`).getMinutes();
+    const minutosEntrada = this.convertirASoloMinutos(hora_entrada);
+    const minutosMeta = this.convertirASoloMinutos(hora_fija); 
+    const tiempoRetraso = minutosEntrada - minutosMeta; 
+    let tiempo = '';
+    if(tiempoRetraso < 0){
+      tiempo = '0';
+    }else{
+      tiempo = tiempoRetraso.toString();
+    }
+    //obtener el id del horario laboral
+    const horarioLaboral = await this.horarioLaboralService.getHorarioLaboralByDia(diaSemana, +docente_id);
+    if(!horarioLaboral){
+      throw new BadRequestException('No existe un horario laboral para el dia seleccionado');
+    }
+    const asistencia = this.asistenciaRepository.create({...createAsistenciaDto, horarioLaboral: horarioLaboral});
+    return this.asistenciaRepository.save(asistencia);
+    //return asistencia;
   }
 
   findAll() {
@@ -116,4 +143,10 @@ export class AsistenciaService {
   remove(id: number) {
     return `This action removes a #${id} asistencia`;
   }
+
+  convertirASoloMinutos(horaString) {
+    const [horas, minutos] = horaString.split(':').map(Number);
+    return horas * 60 + minutos;
+  }
+
 }

@@ -17,6 +17,11 @@ export class HorarioLaboralController {
     return this.horarioLaboralService.findAll();
   }
 
+ /*  @Get('/by-dia/:id')
+  getHorarioLaboralByDia(@Param('id') id: string) {
+    return this.horarioLaboralService.getHorarioLaboralByDia(+id);
+  } */
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.horarioLaboralService.findOne(+id);

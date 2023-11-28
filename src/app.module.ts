@@ -17,11 +17,11 @@ import { LicenciaModule } from './licencia/licencia.module';
     }),
     TypeOrmModule.forRoot({
     type: 'mysql',
-    host: process.env.DB_HOST,
-    port: parseInt(process.env.DB_PORT),
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
+    host: 'colegio-yordice75.mysql.database.azure.com',
+    port: 3306,
+    username: 'yordice75',
+    password: 'Sincontra1234',
+    database: 'bi_microservicio',
     autoLoadEntities: true,
     synchronize: true,
     ssl: {

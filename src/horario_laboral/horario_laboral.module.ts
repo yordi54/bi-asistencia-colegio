@@ -12,6 +12,6 @@ import { HorarioLaboral } from './entities/horario_laboral.entity';
   ],
   controllers: [HorarioLaboralController],
   providers: [HorarioLaboralService],
-  exports: [TypeOrmModule]
+  exports: [TypeOrmModule, HorarioLaboralService]
 })
 export class HorarioLaboralModule {}
